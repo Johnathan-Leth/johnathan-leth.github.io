@@ -19,15 +19,15 @@
 <body>
   <div class='d-flex justify-content-center align-items-center vh-100'>
     <div class='card col-12 col-md-6 col-lg-4'>
-      <i class='wi wi-day-sunny display-1 text-center mb-3'></i>
-      <p>Temperature: <span id="temperature"><i calss='wi wi-na'></i></span></p>
-      <p>Humidity: <span id="humidity">Loading...</span></p>
-      <p>Rain: <span id="rain">Loading...</span></p>
-      <p>Showers: <span id="showers">Loading...</span></p>
-      <p>Snowfall: <span id="snowfall">Loading...</span></p>
-      <p>Cloud Cover: <span id="cloud_cover">Loading...</span></p>
-      <p>Wind Speed: <span id="windSpeed">Loading...</span></p>
-      <p>Wind Direction: <span id="windDirection">Loading...</span></p>
+      <i id="weather-icon" class="wi wi-day-sunny display-1 text-center mb-3"></i>
+      <p>Temperature: <span id="temperature"><i class='wi wi-na'></i></span></p>
+      <p>Humidity: <span id="humidity"><i class='wi wi-na'></i></span></p>
+      <p>Rain: <span id="rain"><i class='wi wi-na'></i></span></p>
+      <p>Showers: <span id="showers"><i class='wi wi-na'></i></span></p>
+      <p>Snowfall: <span id="snowfall"><i class='wi wi-na'></i></span></p>
+      <p>Cloud Cover: <span id="cloud_cover"><i class='wi wi-na'></i></span></p>
+      <p>Wind Speed: <span id="windSpeed"><i class='wi wi-na'></i></span></p>
+      <p>Wind Direction: <span id="windDirection"><i class='wi wi-na'></i></span></p>
     </div>
   </div>
   <script src='https://code.jquery.com/jquery-3.7.1.min.js'
@@ -67,46 +67,70 @@
     function fetchWeather() {
       getUserLocation()
         .then(({ latitude, longitude }) => {
-          const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,rain,showers,snowfall,cloud_cover,wind_speed_10m,wind_direction_10m`;
+          const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,rain,showers,snowfall,cloud_cover,wind_speed_10m,wind_direction_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
 
           return fetch(apiUrl);
         })
         .then(response => response.json())
         .then(data => {
           if (data.current) {
-            const temp = data.current.temperature_2m // C
+            const temp = data.current.temperature_2m // F
             const humidity = data.current.relative_humidity_2m // %
-            const rain = data.current.rain // mm
-            const showers = data.current.showers // mm
-            const snowfall = data.current.snowfall // cm
+            const rain = data.current.rain // in
+            const showers = data.current.showers // in
+            const snowfall = data.current.snowfall // in
             const cloudCover = data.current.cloud_cover // %
-            const windSpeed = data.current.wind_speed_10m // km/h
+            const windSpeed = data.current.wind_speed_10m // mph
             const windDirection = data.current.wind_direction_10m // degrees
 
             // Debug lines
-            console.log(`Temperature: ${temp}°C`)
+            console.log(`Temperature: ${temp}°F`)
             console.log(`Humidity: ${humidity}%`)
-            console.log(`Rain: ${rain} mm`)
-            console.log(`Showers: ${showers} mm`)
-            console.log(`Snowfall: ${snowfall} mm`)
+            console.log(`Rain: ${rain} in`)
+            console.log(`Showers: ${showers} in`)
+            console.log(`Snowfall: ${snowfall} in`)
             console.log(`Cloud Cover: ${cloudCover}%`)
-            console.log(`Wind Speed: ${windSpeed} km/h`)
+            console.log(`Wind Speed: ${windSpeed} mph`)
             console.log(`Wind Direction: ${windDirection}°`)
 
             // Allows for the display of the weather data
-            document.getElementById("temperature").textContent = `${temp}°C`
+            document.getElementById("temperature").textContent = `${temp}°F`
             document.getElementById("humidity").textContent = `${humidity}%`
-            document.getElementById("rain").textContent = `${rain} mm`
-            document.getElementById("showers").textContent = `${showers} mm`
-            document.getElementById("snowfall").textContent = `${snowfall} mm`
+            document.getElementById("rain").textContent = `${rain} in`
+            document.getElementById("showers").textContent = `${showers} in`
+            document.getElementById("snowfall").textContent = `${snowfall} in`
             document.getElementById("cloud_cover").textContent = `${cloudCover}%`
-            document.getElementById("windSpeed").textContent = `${windSpeed} km/h`
+            document.getElementById("windSpeed").textContent = `${windSpeed} mph`
             document.getElementById("windDirection").textContent = `${windDirection}°`
+
+            updateWeatherIcon(rain, showers, snowfall, cloudCover)
           }
         })
         .catch(error => console.error("Error fetching weather data:", error))
     }
 
+    // Dynamic weather icons
+    function updateWeatherIcon(rain, showers, snowfall, cloudCover) {
+      const weatherIcon = document.getElementById("weather-icon");
+
+      let newIconClass = "wi-day-sunny"; // Sunny
+
+      if (snowfall > 1) {
+        newIconClass = "wi-snow";
+      } else if (rain > 1 || showers > 1) {
+        if (cloudCover > 50) {
+          newIconClass = "wi-rain-wind"; // Rain + Cloudy
+        } else {
+          newIconClass = "wi-rain"; // Only Rain
+        }
+      } else if (cloudCover > 70) {
+        newIconClass = "wi-cloudy"; // Cloudy
+      } else if (cloudCover > 30) {
+        newIconClass = "wi-day-cloudy"; // Partly Cloudy
+      }
+
+      weatherIcon.className = `wi ${newIconClass} display-1 text-center mb-3`;
+    }
 
   </script>
 
