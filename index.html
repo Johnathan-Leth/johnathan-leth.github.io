@@ -27,8 +27,7 @@
     window.onload = () => {
       getUserLocation();
     };
-
-
+    // Get the user's location after asking permission first
     function getUserLocation() {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
@@ -45,7 +44,40 @@
         console.error("Geolocation is not supported by this browser.");
       }
     }
+    
+    // Get weather data from the user's location
+    function fetchWeather(latitude, longitude) {
+    const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m&timezone=auto`;
 
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.current) {
+                const temp = data.current.temperature_2m;
+                const humidity = data.current.relative_humidity_2m;
+                const precipitation = data.current.precipitation;
+                const windSpeed = data.current.wind_speed_10m;
+                const windDirection = data.current.wind_direction_10m;
+
+                // Debug lines
+                console.log(`Temperature: ${temp}°C`);
+                console.log(`Humidity: ${humidity}%`);
+                console.log(`Precipitation: ${precipitation} mm`);
+                console.log(`Wind Speed: ${windSpeed} km/h`);
+                console.log(`Wind Direction: ${windDirection}°`);
+                
+                // Allows for the display of the weather data
+                document.getElementById("temperature").textContent = `${temp}°C`;
+                document.getElementById("humidity").textContent = `${humidity}%`;
+                document.getElementById("precipitation").textContent = `${precipitation} mm`;
+                document.getElementById("windSpeed").textContent = `${windSpeed} km/h`;
+                document.getElementById("windDirection").textContent = `${windDirection}°`;
+            }
+        })
+        .catch(error => console.error("Error fetching weather data:", error));
+}
+
+  
   </script>
 
 </body>

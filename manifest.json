@@ -1,6 +1,6 @@
 {
-    "name": "Weather App",
-    "short_name": "Weather",
+    "name": "SwollenHippo Weather App",
+    "short_name": "S.H. Weather",
     "icons": [
       {
         "src": "/images/icon-192x192.png",
