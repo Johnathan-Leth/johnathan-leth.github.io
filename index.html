@@ -30,21 +30,20 @@
     };
     // Get the user's location after asking permission first
     function getUserLocation() {
-      return new Promise((resolve, reject) => {   
-        if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const latitude = position.coords.latitude
-              const longitude = position.coords.longitude
-              resolve(latitude, longitude)
-              //console.log(`Latitude: ${latitude}, Longitude: ${longitude}`); // Debug line
-            },
-            (error) => reject(error)
-          );
-        } else {
-          reject(new Error("Geolocation is not allowed."))
-        }
-      });
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`) // Debug line
+          },
+          (error) => {
+            console.error("Error getting location: ", error.message)
+          }
+        )
+      } else {
+        console.error("Geolocation is not supported by this browser.")
+      }
     }
 
     // Get weather data from the user's location
