@@ -25,7 +25,8 @@
     crossorigin='anonymous'></script>
   <script>
     window.onload = () => {
-      getUserLocation();
+      getUserLocation()
+      .then(fetchWeather(latitude, longitude));
     };
     // Get the user's location after asking permission first
     function getUserLocation() {
