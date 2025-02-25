@@ -9,7 +9,10 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/sandstone/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons-wind.css">
+  <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">-->
   <link rel="manifest" href="/manifest.json">
 </head>
 
@@ -17,9 +20,12 @@
   <div class='d-flex justify-content-center align-items-center vh-100'>
     <div class='card col-12 col-md-6 col-lg-4'>
       <i class='wi wi-day-sunny display-1 text-center mb-3'></i>
-      <p>Temperature: <span id="temperature">Loading...</span></p>
+      <p>Temperature: <span id="temperature"><i calss='wi wi-na'></i></span></p>
       <p>Humidity: <span id="humidity">Loading...</span></p>
-      <p>Precipitation: <span id="precipitation">Loading...</span></p>
+      <p>Rain: <span id="rain">Loading...</span></p>
+      <p>Showers: <span id="showers">Loading...</span></p>
+      <p>Snowfall: <span id="snowfall">Loading...</span></p>
+      <p>Cloud Cover: <span id="cloud_cover">Loading...</span></p>
       <p>Wind Speed: <span id="windSpeed">Loading...</span></p>
       <p>Wind Direction: <span id="windDirection">Loading...</span></p>
     </div>
@@ -61,30 +67,39 @@
     function fetchWeather() {
       getUserLocation()
         .then(({ latitude, longitude }) => {
-          const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m&timezone=auto`;
+          const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,rain,showers,snowfall,cloud_cover,wind_speed_10m,wind_direction_10m`;
 
           return fetch(apiUrl);
         })
         .then(response => response.json())
         .then(data => {
           if (data.current) {
-            const temp = data.current.temperature_2m
-            const humidity = data.current.relative_humidity_2m
-            const precipitation = data.current.precipitation
-            const windSpeed = data.current.wind_speed_10m
-            const windDirection = data.current.wind_direction_10m
+            const temp = data.current.temperature_2m // C
+            const humidity = data.current.relative_humidity_2m // %
+            const rain = data.current.rain // mm
+            const showers = data.current.showers // mm
+            const snowfall = data.current.snowfall // cm
+            const cloudCover = data.current.cloud_cover // %
+            const windSpeed = data.current.wind_speed_10m // km/h
+            const windDirection = data.current.wind_direction_10m // degrees
 
             // Debug lines
             console.log(`Temperature: ${temp}°C`)
             console.log(`Humidity: ${humidity}%`)
-            console.log(`Precipitation: ${precipitation} mm`)
+            console.log(`Rain: ${rain} mm`)
+            console.log(`Showers: ${showers} mm`)
+            console.log(`Snowfall: ${snowfall} mm`)
+            console.log(`Cloud Cover: ${cloudCover}%`)
             console.log(`Wind Speed: ${windSpeed} km/h`)
             console.log(`Wind Direction: ${windDirection}°`)
 
             // Allows for the display of the weather data
             document.getElementById("temperature").textContent = `${temp}°C`
             document.getElementById("humidity").textContent = `${humidity}%`
-            document.getElementById("precipitation").textContent = `${precipitation} mm`
+            document.getElementById("rain").textContent = `${rain} mm`
+            document.getElementById("showers").textContent = `${showers} mm`
+            document.getElementById("snowfall").textContent = `${snowfall} mm`
+            document.getElementById("cloud_cover").textContent = `${cloudCover}%`
             document.getElementById("windSpeed").textContent = `${windSpeed} km/h`
             document.getElementById("windDirection").textContent = `${windDirection}°`
           }
